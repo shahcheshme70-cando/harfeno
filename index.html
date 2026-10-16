@@ -165,15 +165,17 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 /* reader */
 .scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:40;opacity:0;transition:opacity .22s var(--ease-out)}
 .scrim.on{opacity:1}
-.reader{position:fixed;top:0;bottom:0;right:0;width:min(1040px,100%);background:var(--page);z-index:41;box-shadow:var(--shadow-4);display:flex;flex-direction:column;transform:translateX(24px);opacity:0;transition:transform .36s var(--ease-out),opacity .22s var(--ease-out);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.reader{position:fixed;inset:0;width:100%;background:var(--page);z-index:41;display:flex;flex-direction:column;transform:translateY(8px);opacity:0;transition:transform .36s var(--ease-out),opacity .22s var(--ease-out);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader.on{transform:none;opacity:1}
-.r-head{display:flex;gap:12px;align-items:center;padding:14px max(20px,env(safe-area-inset-right,0px)) 14px 20px;border-bottom:1px solid var(--hair);position:relative}
+.r-head{display:flex;gap:12px;align-items:center;padding:14px max(20px,env(safe-area-inset-right,0px)) 14px max(20px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--hair);position:relative}
+.r-headin{display:flex;gap:12px;align-items:center;width:100%;max-width:1180px;margin:0 auto}
 .r-head .crumb{font-size:13px;color:var(--muted);line-height:1.6;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .r-actions{display:flex;gap:8px;flex-wrap:wrap}
 .progress{position:absolute;bottom:-1px;right:0;height:2px;background:var(--brand);width:0;transition:width .1s linear}
 .r-body{flex:1;overflow:auto;scroll-behavior:smooth}
-.r-grid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:40px;padding:28px max(28px,env(safe-area-inset-right,0px)) 80px 28px;max-width:1040px}
-.r-grid.notoc{grid-template-columns:minmax(0,1fr)}
+.r-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:56px;padding:40px max(28px,env(safe-area-inset-right,0px)) 96px max(28px,env(safe-area-inset-left,0px));max-width:1180px;margin:0 auto}
+.r-grid.notoc{grid-template-columns:minmax(0,1fr);max-width:860px}
+.r-grid>div{min-width:0;justify-self:center;width:100%;max-width:760px}
 .toc{position:sticky;top:12px;align-self:start;font-size:14px;line-height:1.6;max-height:calc(100vh - 140px);overflow:auto;order:-1}
 .toc b{display:block;font-size:12px;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
 .toc a{display:block;text-decoration:none;color:var(--body);padding:5px 10px;border-radius:8px;border-right:2px solid var(--hair)}
@@ -188,7 +190,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .r-title{font-size:30px;font-weight:800;color:var(--strong);line-height:1.42;margin:0 0 6px;text-wrap:balance}
 .r-meta{font-size:13px;color:var(--muted);margin-bottom:24px}
 
-.doc{font-size:17px;line-height:2.05;color:var(--body);max-width:66ch}
+.doc{font-size:17px;line-height:2.05;color:var(--body)}
 .doc p,.doc li{text-align:justify;text-justify:inter-word;hyphens:auto}
 .doc h1,.doc h2,.doc h3,.doc h4{color:var(--strong);line-height:1.42;font-weight:800;text-wrap:balance;margin:1.8em 0 .5em;scroll-margin-top:16px;text-align:right}
 .doc > :first-child{margin-top:0}
@@ -301,7 +303,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 
 <div class="scrim" id="scrim" hidden></div>
 <article class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
-  <div class="r-head">
+  <div class="r-head"><div class="r-headin">
     <div class="crumb" id="rCrumb"></div>
     <div class="r-actions">
       <a class="btn sm" id="rWord" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg><span class="lbl">Word</span></a>
@@ -309,7 +311,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
       <button class="btn sm" id="rCopy" type="button" title="کپی متن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><span class="lbl">کپی</span></button>
       <button class="btn sm icon" id="rClose" type="button" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
-    <div class="progress" id="rProg"></div>
+    </div><div class="progress" id="rProg"></div>
   </div>
   <div class="r-body" id="rBody">
     <div class="r-grid" id="rGrid">
