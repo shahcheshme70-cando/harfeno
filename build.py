@@ -156,7 +156,8 @@ def design_item(path, halls):
                 item["cm"] = [round(w / d * 2.54), round(h / d * 2.54)]
             if not orient:
                 orient = "portrait" if h > w else "landscape"
-            stamp = f"{os.path.getsize(path)}:{os.path.getmtime(path)}"
+            with open(path, "rb") as fh:
+                stamp = hashlib.sha1(fh.read()).hexdigest()
             sfile = big + ".sha"
             if not (os.path.exists(big) and os.path.exists(thumb) and os.path.exists(sfile) and open(sfile).read() == stamp):
                 os.makedirs(os.path.dirname(big), exist_ok=True)
