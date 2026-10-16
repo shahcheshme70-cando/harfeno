@@ -103,13 +103,23 @@ def text_item(path, halls):
     meta, body = front_matter(raw)
     h = halls.get(hall, {"stations": []})
     st_name = h["stations"][st - 1] if st and st <= len(h["stations"]) else None
-    title = meta.get("title") or st_name
+    # سرتیتر کلی فایل (# ...) حذف می‌شود؛ اگر فایل فقط یک تیتر ## دارد، همان عنوان محتواست
+    body = re.sub(r"\A\s*#\s+.+\n", "", body)
+    subtitle = ""
+    h2 = re.findall(r"^##\s+(.+?)\s*$", body, re.M)
+    title = meta.get("title")
+    if not title and len(h2) == 1:
+        raw_t = h2[0]
+        m = re.match(r"^(.*?)\s*\((.+)\)\s*$", raw_t)
+        title, subtitle = (m.group(1), m.group(2)) if m else (raw_t, "")
+        body = re.sub(r"^##\s+" + re.escape(raw_t) + r"\s*\n", "", body, count=1, flags=re.M)
     if not title:
-        m = re.search(r"^#\s+(.+)$", body, re.M)
-        title = m.group(1).strip() if m else os.path.splitext(os.path.basename(path))[0]
+        title = st_name or os.path.splitext(os.path.basename(path))[0]
+    if not meta.get("type"):
+        meta["type"] = "روایت" if title.startswith("روایت") else ("متن سازه" if title.startswith("سازه") else "متن")
     item = {
         "kind": "text", "file": rel(path), "title": title, "hall": hall, "station": st,
-        "type": meta.get("type") or "متن", "summary": meta.get("summary", ""),
+        "type": meta.get("type") or "متن", "summary": meta.get("summary", "") or subtitle,
         "bytes": os.path.getsize(path), "toc": toc(body), "text": body.strip(),
     }
     # نسخهٔ Word برای دانلود
@@ -131,12 +141,13 @@ def design_item(path, halls):
     hall, st = location(path)
     stem = os.path.splitext(os.path.basename(path))[0]
     ext = os.path.splitext(path)[1].lower()
-    label = stem
+    tail = stem.split(" - ")[-1].strip() if " - " in stem else stem
+    label = tail if tail.startswith("طرح") else "طرح " + tail
     orient = None
     if "عمودی" in stem or "amudi" in stem.lower():
-        label, orient = "طرح عمودی", "portrait"
+        orient = "portrait"
     elif "افقی" in stem or "ofoghi" in stem.lower():
-        label, orient = "طرح افقی", "landscape"
+        orient = "landscape"
     item = {
         "kind": "design", "file": rel(path), "title": label, "name": os.path.basename(path),
         "hall": hall, "station": st, "type": "طرح", "format": ext[1:].upper().replace("JPEG", "JPG"),
@@ -156,6 +167,8 @@ def design_item(path, halls):
                 item["cm"] = [round(w / d * 2.54), round(h / d * 2.54)]
             if not orient:
                 orient = "portrait" if h > w else "landscape"
+            if w / h >= 2:
+                item["wide"] = True
             with open(path, "rb") as fh:
                 stamp = hashlib.sha1(fh.read()).hexdigest()
             sfile = big + ".sha"

@@ -142,6 +142,8 @@ a{color:inherit}
 
 .designs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:14px;align-items:end}
 .design{display:grid;gap:10px;min-width:0}
+.design.wide{grid-column:1/-1}
+.design.wide .thumb{height:auto;min-height:120px}
 .design .thumb{display:flex;align-items:center;justify-content:center;background:var(--sunken);border-radius:14px;padding:12px;cursor:zoom-in;border:1px solid transparent;transition:border-color .14s var(--ease),transform .14s var(--ease);height:260px;width:100%}
 .design .thumb:hover{border-color:var(--line-strong);transform:translateY(-2px)}
 .design .thumb img{max-width:100%;max-height:100%;display:block;border-radius:4px;box-shadow:0 6px 18px rgba(27,29,51,.18)}
@@ -468,7 +470,7 @@ function render(){
       list.forEach(it=>{const k=it.station||0;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(it)});
       [...groups.keys()].sort((a,b)=>(a||999)-(b||999)).forEach(k=>{
         const items=groups.get(k);
-        const texts=items.filter(i=>i.kind==="text"),designs=items.filter(i=>i.kind==="design").sort((a,b)=>a.orient===b.orient?0:a.orient==="portrait"?-1:1);
+        const texts=items.filter(i=>i.kind==="text"),designs=items.filter(i=>i.kind==="design").sort((a,b)=>a.orient===b.orient?a.title.localeCompare(b.title,"fa"):a.orient==="portrait"?-1:1);
         html+=`<div class="station" id="st-${h.id}-${k}"><div class="station-head">${k?`<span class="num">ایستگاه ${fa(k)}</span>`:""}<h4>${highlight(k?stName(h,k):(h.stations.length?"کل سالن":h.name),terms)}</h4></div><div class="station-body">`;
         if(texts.length){
           html+=`<div class="texts">`;
@@ -482,7 +484,7 @@ function render(){
         if(designs.length){
           html+=`<div class="designs">`;
           designs.forEach(it=>{
-            html+=`<div class="design"><button class="thumb" type="button" data-view="${esc(it.file)}" aria-label="پیش‌نمایش ${esc(it.title)}">${it.thumb?`<img src="${url(it.thumb)}" alt="${esc(it.title)}" loading="lazy">`:`<span>${esc(it.format)}</span>`}</button><div class="info"><div><b>${highlight(it.title,terms)}</b><small>${designMeta(it)}</small></div><a class="btn sm icon" href="${url(it.file)}" download="${esc(it.name)}" title="دانلود فایل چاپی" aria-label="دانلود ${esc(it.title)}">${ICO_DL}</a></div></div>`;
+            html+=`<div class="design${it.wide?" wide":""}"><button class="thumb" type="button" data-view="${esc(it.file)}" aria-label="پیش‌نمایش ${esc(it.title)}">${it.thumb?`<img src="${url(it.thumb)}" alt="${esc(it.title)}" loading="lazy">`:`<span>${esc(it.format)}</span>`}</button><div class="info"><div><b>${highlight(it.title,terms)}</b><small>${designMeta(it)}</small></div><a class="btn sm icon" href="${url(it.file)}" download="${esc(it.name)}" title="دانلود فایل چاپی" aria-label="دانلود ${esc(it.title)}">${ICO_DL}</a></div></div>`;
           });
           html+=`</div>`;
         }
@@ -579,7 +581,7 @@ function selectDoc(){const r=document.createRange();r.selectNodeContents($("#rDo
 let lbList=[],lbIdx=0,lbFocus=null;
 function openLb(file){
   const it=DATA.items.find(i=>i.file===file);if(!it)return;
-  lbList=DATA.items.filter(i=>i.kind==="design"&&i.hall===it.hall&&i.station===it.station).sort((a,b)=>a.orient===b.orient?0:a.orient==="portrait"?-1:1);
+  lbList=DATA.items.filter(i=>i.kind==="design"&&i.hall===it.hall&&i.station===it.station).sort((a,b)=>a.orient===b.orient?a.title.localeCompare(b.title,"fa"):a.orient==="portrait"?-1:1);
   lbIdx=lbList.indexOf(it);lbFocus=document.activeElement;
   showLb();
   $("#lb").hidden=false;requestAnimationFrame(()=>$("#lb").classList.add("on"));
