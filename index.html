@@ -300,6 +300,7 @@ load().then(d=>{
     it._head=norm([it.title,it.summary,it.type,h.name,it._st].join(" "));
     it._body=norm(it.text);
   });
+  if(!d.items.length)state.showEmpty=true;
   buildFilters();render();
   const m=location.hash.match(/^#(salon-[0-9b]+)$/);if(m){const el=document.getElementById(m[1]);if(el)el.scrollIntoView()}
 }).catch(()=>{
@@ -316,6 +317,7 @@ function buildFilters(){
   let t=`<button class="chip" data-type="all" aria-pressed="true">همهٔ انواع</button>`;
   Object.keys(typeCount).sort((a,b)=>typeCount[b]-typeCount[a]).forEach(k=>{t+=`<button class="chip" data-type="${esc(k)}" aria-pressed="false">${esc(k)} <span class="n">${fa(typeCount[k])}</span></button>`});
   $("#types").innerHTML=t;
+  $("#types").hidden=!DATA.items.length;
   $("#parts").addEventListener("click",e=>{const b=e.target.closest("[data-part]");if(!b)return;state.part=b.dataset.part;press("#parts","part",state.part);render()});
   $("#types").addEventListener("click",e=>{const b=e.target.closest("[data-type]");if(!b)return;state.type=b.dataset.type;press("#types","type",state.type);render()});
   $("#showEmpty").addEventListener("change",e=>{state.showEmpty=e.target.checked;try{localStorage.setItem("hn-filters",JSON.stringify({showEmpty:state.showEmpty}))}catch(_){}render()});
@@ -368,7 +370,8 @@ function render(){
 
   // status
   const st=$("#status");
-  if(terms.length)st.innerHTML=`<b>${fa(hits.length)}</b> محتوا برای «${esc(state.q.trim())}» در <b>${fa(Object.keys(byHall).length)}</b> سالن`;
+  if(!DATA.items.length)st.innerHTML=`هنوز محتوایی بارگذاری نشده · <b>${fa(DATA.halls.filter(h=>h.id!=="0"&&h.id!=="b").length)}</b> سالن آمادهٔ محتوا`;
+  else if(terms.length)st.innerHTML=`<b>${fa(hits.length)}</b> محتوا برای «${esc(state.q.trim())}» در <b>${fa(Object.keys(byHall).length)}</b> سالن`;
   else st.innerHTML=`<b>${fa(hits.length)}</b> محتوا در <b>${fa(Object.keys(byHall).length)}</b> سالن · ${fa(DATA.halls.filter(h=>h.id!=="0"&&h.id!=="b").length)} سالن و ${fa(DATA.halls.reduce((s,h)=>s+h.stations.length,0)-2)} ایستگاه در نقشه`;
 
   // rail
