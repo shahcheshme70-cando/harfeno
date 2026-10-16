@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """ساخت content.json از پوشهٔ content/
 
-هر سالن یک پوشه دارد: content/salon-3/ ، content/salon-16/ ، content/salon-0/ (ورودی) ، content/salon-b/ (بعثت زنانه)
+ساختار: content/salon-03/istgah-02/  (سالن و ایستگاه از نام پوشه خوانده می‌شود)
+salon-00 = ورودی ، salon-b = بعثت زنانه
 هر فایل .md می‌تواند این سرآیند را داشته باشد (همه اختیاری‌اند):
 
 ---
@@ -29,13 +30,15 @@ def parse(path):
             if ":" in line:
                 k, v = line.split(":", 1)
                 meta[k.strip()] = v.strip()
-    folder = os.path.basename(os.path.dirname(path))
-    hall = meta.get("hall") or (folder[6:] if folder.startswith("salon-") else "0")
+    rel = os.path.relpath(path, os.path.join(ROOT, "content")).split(os.sep)
+    hall_dir = next((d[6:] for d in rel if d.startswith("salon-")), "0")
+    hall = meta.get("hall") or (hall_dir.lstrip("0") or "0")
+    st_dir = next((d[7:] for d in rel if d.startswith("istgah-")), "")
     title = meta.get("title")
     if not title:
         h = re.search(r"^#\s+(.+)$", body, re.M)
         title = h.group(1).strip() if h else os.path.splitext(os.path.basename(path))[0]
-    st = meta.get("station", "")
+    st = meta.get("station", "") or st_dir.lstrip("0")
     return {
         "file": os.path.relpath(path, ROOT).replace(os.sep, "/"),
         "title": title,
@@ -49,7 +52,8 @@ def parse(path):
 
 def main():
     halls = json.load(open(os.path.join(ROOT, "halls.json"), encoding="utf-8"))
-    items = [parse(p) for p in sorted(glob.glob(os.path.join(ROOT, "content", "**", "*.md"), recursive=True))]
+    items = [parse(p) for p in sorted(glob.glob(os.path.join(ROOT, "content", "**", "*.md"), recursive=True))
+             if os.path.basename(p).lower() != "readme.md"]
     out = {"parts": halls["parts"], "halls": halls["halls"], "items": items}
     with open(os.path.join(ROOT, "content.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
