@@ -59,6 +59,7 @@
   color-scheme:dark}
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;direction:rtl}
 body{margin:0;background:var(--page);color:var(--body);font-family:var(--font);font-size:16px;line-height:1.85;direction:rtl}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--page)}
@@ -98,11 +99,12 @@ a{color:inherit}
 .rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px);align-self:start;max-height:calc(100vh - 120px);overflow:auto;scrollbar-width:thin}
 .rail h2{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin:18px 0 6px}
 .rail h2:first-child{margin-top:0}
-.rail a{display:grid;grid-template-columns:28px 1fr auto;gap:6px;align-items:center;padding:5px 10px;border-radius:10px;text-decoration:none;color:var(--body);font-size:14px;line-height:1.5}
+.rail a{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:6px;align-items:center;padding:6px 10px;border-radius:10px;text-decoration:none;color:var(--body);font-size:14px;line-height:1.5}
 .rail a:hover{background:var(--sunken)}
 .rail a .no,.rail a .ct{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .rail a.empty{color:var(--subtle)}
-.rail a.full .ct{color:var(--brand-text);font-weight:700}
+.rail a.full{color:var(--strong);font-weight:600}
+.rail a.full .ct{color:var(--brand-text);background:var(--brand-soft);font-weight:700;border-radius:999px;padding:0 8px;min-width:22px;text-align:center}
 
 .part{margin-top:40px}
 .part:first-child{margin-top:0}
@@ -175,7 +177,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .r-actions{display:flex;gap:8px;flex-wrap:wrap}
 .progress{position:absolute;bottom:-1px;right:0;height:2px;background:var(--brand);width:0;transition:width .1s linear}
 .r-body{flex:1;overflow:auto;scroll-behavior:smooth}
-.r-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:56px;padding:40px max(28px,env(safe-area-inset-right,0px)) 96px max(28px,env(safe-area-inset-left,0px));max-width:1180px;margin:0 auto}
+.r-grid{display:grid;grid-template-columns:250px minmax(0,1fr);gap:56px;padding:40px max(28px,env(safe-area-inset-right,0px)) 96px max(28px,env(safe-area-inset-left,0px));max-width:1180px;margin:0 auto}
 .r-grid.notoc{grid-template-columns:minmax(0,1fr);max-width:860px}
 .r-grid>div{min-width:0;justify-self:center;width:100%;max-width:760px}
 .toc{position:sticky;top:12px;align-self:start;font-size:14px;line-height:1.6;max-height:calc(100vh - 140px);overflow:auto;order:-1}
@@ -338,8 +340,8 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="assets/vendor/marked.min.js"></script>
+<script src="assets/vendor/purify.min.js"></script>
 <script>
 (function(){
 const $=s=>document.querySelector(s);
@@ -520,7 +522,7 @@ function openReader(file){
   $("#rMeta").textContent=it.type+" · حدود "+fa(Math.max(1,Math.round(words/200)))+" دقیقه خواندن";
   const w=$("#rWord");
   if(it.docx){w.hidden=false;w.href=url(it.docx);w.setAttribute("download",it.title+".docx")}else w.hidden=true;
-  let raw;try{raw=marked.parse(it.text.replace(/★/g,""),{gfm:true})}catch(e){raw="<pre>"+esc(it.text)+"</pre>"}
+  let raw;try{raw=marked.parse(it.text.replace(/★/g,""),{gfm:true,breaks:true})}catch(e){raw=it.text.split(/\n{2,}/).map(b=>{const m=b.match(/^(#{2,4})\s+(.+)/);return m?`<h${m[1].length}>${esc(m[2])}</h${m[1].length}>`:`<p>${esc(b).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>")}</p>`}).join("")}
   $("#rDoc").innerHTML=window.DOMPurify?DOMPurify.sanitize(raw):raw;
   $("#rDoc").querySelectorAll("table").forEach(t=>{const x=document.createElement("div");x.className="tbl";t.parentNode.insertBefore(x,t);x.appendChild(t)});
   // drop a leading h1 that repeats the title
