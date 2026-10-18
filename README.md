@@ -30,3 +30,14 @@ summary: یک جملهٔ کوتاه دربارهٔ محتوا
 python3 build.py
 python3 -m http.server
 ```
+
+## نکته‌های دیپلوی روی سرور
+
+- کل مخزن را در مسیر سایت (مثلاً `mohtava/`) قرار دهید؛ ساخت یا نصبی لازم نیست.
+- برای رسیدن محتوای تازه، `git pull` را خودکار کنید (cron هر چند دقیقه، یا webhook گیت‌هاب).
+- کش پیشنهادی:
+  - `index.html` و `content.json`: بدون کش طولانی (`Cache-Control: no-cache`)
+  - `assets/` و `generated/`: کش طولانی (مثلاً ۳۰ روز)
+- نوع فایل‌ها باید درست تعریف شده باشد: `.webp` ← `image/webp`، `.woff` ← `font/woff`، `.docx` ← `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- فشرده‌سازی gzip/brotli را برای `.html` ، `.json` و `.js` روشن کنید (حجم `content.json` حدوداً یک‌چهارم می‌شود).
+- سایت به هیچ سرویس خارجی (CDN) وابسته نیست.

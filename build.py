@@ -75,14 +75,94 @@ def toc(md):
     return out
 
 
+DOCX_VERSION = "rtl-4"  # با تغییر این مقدار، همهٔ فایل‌های Word دوباره ساخته می‌شوند
+
+
+def rtlize_docx(path):
+    """راست‌به‌چپ، جاستیفای و فونت فارسی برای فایل Word ساخته‌شده با pandoc"""
+    try:
+        from docx import Document
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+    except ImportError:
+        return
+    doc = Document(path)
+    FONT = "Tahoma"
+
+    def set_run(rpr):
+        fonts = rpr.find(qn("w:rFonts"))
+        if fonts is None:
+            fonts = OxmlElement("w:rFonts")
+            rpr.insert(0, fonts)
+        for a in ("w:cs", "w:ascii", "w:hAnsi"):
+            if a != "w:ascii" or fonts.get(qn("w:ascii")) is None:
+                fonts.set(qn(a), FONT)
+        if rpr.find(qn("w:rtl")) is None:
+            rpr.append(OxmlElement("w:rtl"))
+
+    def set_par(ppr, justify):
+        if ppr.find(qn("w:bidi")) is None:
+            ppr.append(OxmlElement("w:bidi"))
+        jc = ppr.find(qn("w:jc"))
+        if jc is None:
+            jc = OxmlElement("w:jc")
+            ppr.append(jc)
+        jc.set(qn("w:val"), "both" if justify else "right")
+
+    for st in doc.styles.element.iter(qn("w:style")):
+        ppr = st.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = OxmlElement("w:pPr")
+            st.append(ppr)
+        sid = st.get(qn("w:styleId")) or ""
+        set_par(ppr, sid in ("Normal", "BodyText", "FirstParagraph", "Compact"))
+        rpr = st.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = OxmlElement("w:rPr")
+            st.append(rpr)
+        set_run(rpr)
+        if sid in ("Normal", "BodyText", "FirstParagraph"):
+            for tag, val in (("w:sz", "24"), ("w:szCs", "24")):
+                el = rpr.find(qn(tag))
+                if el is None:
+                    el = OxmlElement(tag)
+                    rpr.append(el)
+                el.set(qn("w:val"), val)
+    body = doc.element.body
+    for p in body.iter(qn("w:p")):
+        ppr = p.find(qn("w:pPr"))
+        if ppr is None:
+            ppr = OxmlElement("w:pPr")
+            p.insert(0, ppr)
+        style = ppr.find(qn("w:pStyle"))
+        sid = style.get(qn("w:val")) if style is not None else "Normal"
+        has_br = p.find(".//" + qn("w:br")) is not None
+        set_par(ppr, not has_br and not sid.lower().startswith(("heading", "title", "subtitle")))
+        for r in p.iter(qn("w:r")):
+            rpr = r.find(qn("w:rPr"))
+            if rpr is None:
+                rpr = OxmlElement("w:rPr")
+                r.insert(0, rpr)
+            set_run(rpr)
+    for tbl in body.iter(qn("w:tbl")):
+        tpr = tbl.find(qn("w:tblPr"))
+        if tpr is not None and tpr.find(qn("w:bidiVisual")) is None:
+            tpr.append(OxmlElement("w:bidiVisual"))
+    sect = body.find(qn("w:sectPr"))
+    if sect is not None and sect.find(qn("w:bidi")) is None:
+        sect.append(OxmlElement("w:bidi"))
+    doc.save(path)
+
+
 def docx_from_md(md_text, title, dest):
     if not shutil.which("pandoc"):
         return False
     tmp = dest + ".src.md"
     with open(tmp, "w", encoding="utf-8") as f:
-        f.write(f"---\ntitle: \"{title}\"\ndir: rtl\nlang: fa-IR\n---\n\n{md_text}")
+        f.write(f"---\ntitle: \"{title}\"\ndir: rtl\nlang: fa-IR\n---\n\n{md_text.replace('★', '')}")
     try:
-        subprocess.run(["pandoc", tmp, "-o", dest], check=True)
+        subprocess.run(["pandoc", tmp, "-f", "markdown-smart+hard_line_breaks", "-o", dest], check=True)
+        rtlize_docx(dest)
         return True
     except Exception:
         return False
@@ -128,7 +208,7 @@ def text_item(path, halls):
     else:
         dest = os.path.join(GEN, "docx", key(path) + ".docx")
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        stamp = hashlib.sha1(raw.encode("utf-8")).hexdigest()
+        stamp = hashlib.sha1((DOCX_VERSION + raw).encode("utf-8")).hexdigest()
         stamp_file = dest + ".sha"
         fresh = os.path.exists(dest) and os.path.exists(stamp_file) and open(stamp_file).read() == stamp
         if fresh or docx_from_md(body, title, dest):

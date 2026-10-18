@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>محتوای حرف نو</title>
+<meta name="description" content="متن روایت‌ها و طرح‌های باکیفیت نمایشگاه حرف نو، به تفکیک سالن‌ها و ایستگاه‌ها؛ با امکان جست‌وجو، خواندن و دانلود.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:site_name" content="حرف نو">
+<meta property="og:title" content="محتوای حرف نو">
+<meta property="og:description" content="متن روایت‌ها و طرح‌های باکیفیت نمایشگاه حرف نو، به تفکیک سالن‌ها و ایستگاه‌ها.">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#262943" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 501 529.1'%3E%3Cpath fill='%232FB57C' d='M250.5,0h0C112.1,0,0,112.1,0,250.5v278.6h120.8l-.8-117.9v-163.4c0-72.2,58.5-130.7,130.7-130.7h0c72.2,0,130.7,58.5,130.7,130.7v163.4h-147.5l-54.3,117.9h321.3V250.5C501,112.1,388.8,0,250.5,0Z'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/RavaghFaNum-Regular.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="assets/fonts/RavaghFaNum-ExtraBold.woff" as="font" type="font/woff" crossorigin>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: sticky search header · right rail of halls · list part → hall → station card (texts + design tiles) · reader sheet with TOC · design lightbox */
@@ -15,9 +26,9 @@
 :root{
   --font:"Ravagh","Vazirmatn","Segoe UI",Tahoma,sans-serif;
   --page:#FFFFFF; --sunken:#F7F8FA; --card:#FFFFFF; --muted-surface:#EFF1F5;
-  --strong:#30345A; --body:#4A4F73; --muted:#7B80A0; --subtle:#B9BCCF;
+  --strong:#30345A; --body:#4A4F73; --muted:#5F6485; --subtle:#6A6F90;
   --hair:#EAEAEA; --line-strong:#D8DBE4;
-  --brand:#2FB57C; --brand-dark:#249264; --brand-soft:#E4F6ED; --brand-text:#1A6E4B; --on-brand:#FFFFFF;
+  --brand:#2FB57C; --brand-dark:#249264; --btn:#1C7D53; --btn-hover:#16673F; --brand-soft:#E4F6ED; --brand-text:#1A6E4B; --on-brand:#FFFFFF;
   --accent:#6E7FD9; --accent-text:#5566C4; --accent-soft:#EDF0FB;
   --amber-soft:#FDF4E0; --amber-text:#BE8916;
   --navy-soft:#E7E9F0; --navy-text:#30345A;
@@ -33,7 +44,7 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --page:#262943; --sunken:#1D1F35; --card:#2E3252; --muted-surface:#383D63;
-  --strong:#FFFFFF; --body:#E7E9F0; --muted:#B9BCCF; --subtle:#7B80A0;
+  --strong:#FFFFFF; --body:#E7E9F0; --muted:#B9BCCF; --subtle:#A3A7C2;
   --hair:#3D416A; --line-strong:#4E5380;
   --brand-soft:rgba(47,181,124,.16); --brand-text:#A9E1C7;
   --accent-text:#C3CAF0; --accent-soft:rgba(110,127,217,.2);
@@ -46,7 +57,7 @@
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --page:#262943; --sunken:#1D1F35; --card:#2E3252; --muted-surface:#383D63;
-  --strong:#FFFFFF; --body:#E7E9F0; --muted:#B9BCCF; --subtle:#7B80A0;
+  --strong:#FFFFFF; --body:#E7E9F0; --muted:#B9BCCF; --subtle:#A3A7C2;
   --hair:#3D416A; --line-strong:#4E5380;
   --brand-soft:rgba(47,181,124,.16); --brand-text:#A9E1C7;
   --accent-text:#C3CAF0; --accent-soft:rgba(110,127,217,.2);
@@ -103,6 +114,8 @@ a{color:inherit}
 .rail a:hover{background:var(--sunken)}
 .rail a .no,.rail a .ct{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .rail a.empty{color:var(--subtle)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.noscript{padding:48px 16px;text-align:center;color:var(--strong)}
 .rail a.full{color:var(--strong);font-weight:600}
 .rail a.full .ct{color:var(--brand-text);background:var(--brand-soft);font-weight:700;border-radius:999px;padding:0 8px;min-width:22px;text-align:center}
 
@@ -157,10 +170,10 @@ a{color:inherit}
 .btn:hover{background:var(--sunken)}
 .btn:active{transform:scale(.985)}
 .btn svg{width:18px;height:18px;flex:none}
-.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
-.btn.primary:hover{background:var(--brand-dark)}
-.btn.sm{height:36px;padding:0 12px;font-size:13px}
-.btn.icon{width:36px;padding:0}
+.btn.primary{background:var(--btn);border-color:var(--btn);color:var(--on-brand)}
+.btn.primary:hover{background:var(--btn-hover)}
+.btn.sm{height:40px;padding:0 14px;font-size:13px}
+.btn.icon{width:40px;padding:0}
 
 mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .nores{padding:64px 16px;text-align:center;color:var(--muted)}
@@ -219,7 +232,8 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 .lb-bar .t small{display:block;font-size:12px;opacity:.7;font-variant-numeric:tabular-nums}
 .lb .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:var(--on-stage)}
 .lb .btn:hover{background:rgba(255,255,255,.18)}
-.lb .btn.primary{background:var(--brand);border-color:var(--brand)}
+.lb .btn.primary{background:var(--btn);border-color:var(--btn)}
+.lb .btn.primary:hover{background:var(--btn-hover)}
 .lb-stage{direction:ltr;flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:8px 16px 24px;cursor:zoom-in;position:relative}
 .lb-stage img{max-width:100%;max-height:100%;object-fit:contain;display:block;border-radius:4px}
 .lb-stage.zoom{cursor:zoom-out;align-items:flex-start;justify-content:flex-start}
@@ -293,6 +307,8 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 </header>
 
 <main class="wrap" id="top">
+  <h1 class="sr-only">محتوای سالن‌های نمایشگاه حرف نو</h1>
+  <noscript><p class="noscript">برای دیدن فهرست محتوا، جاوااسکریپت مرورگر را روشن کنید.</p></noscript>
   <div class="filters" id="parts" aria-label="بخش‌ها"></div>
   <div class="filters" id="kinds" aria-label="نوع محتوا"></div>
   <div class="status" id="status" aria-live="polite"></div>
@@ -304,7 +320,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
 
 
 <div class="scrim" id="scrim" hidden></div>
-<article class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="rTitle">
   <div class="r-head"><div class="r-headin">
     <div class="crumb" id="rCrumb"></div>
     <div class="r-actions">
@@ -326,7 +342,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
       <nav class="toc" id="toc" aria-label="فهرست مطالب"></nav>
     </div>
   </div>
-</article>
+</div>
 
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="پیش‌نمایش طرح">
   <div class="lb-bar">
@@ -425,7 +441,7 @@ function designMeta(it){
   const p=[it.format,mb(it.bytes)];
   if(it.cm)p.push(fa(it.cm[0])+"×"+fa(it.cm[1])+" سانتی‌متر");
   if(it.dpi)p.push(fa(it.dpi)+" dpi");
-  return p.join(" · ");
+  return p.join("، ");
 }
 
 function render(){
@@ -443,7 +459,7 @@ function render(){
   const nT=hits.filter(i=>i.kind==="text").length,nD=hits.length-nT;
 
   const st=$("#status");
-  if(!DATA.items.length)st.innerHTML=`هنوز محتوایی بارگذاری نشده · <b>${fa(DATA.halls.filter(h=>h.id!=="0"&&h.id!=="b").length)}</b> سالن آمادهٔ محتوا`;
+  if(!DATA.items.length)st.innerHTML=`هنوز محتوایی بارگذاری نشده، <b>${fa(DATA.halls.filter(h=>h.id!=="0"&&h.id!=="b").length)}</b> سالن آمادهٔ محتوا`;
   else st.innerHTML=(terms.length?`نتیجهٔ «${esc(state.q.trim())}»: `:"")+`<b>${fa(nT)}</b> متن و <b>${fa(nD)}</b> طرح در <b>${fa(Object.keys(by).length)}</b> سالن`;
 
   let rail="";
@@ -463,7 +479,7 @@ function render(){
     hs.forEach(h=>{
       const list=by[h.id]||[];
       const has=new Set(DATA.items.filter(i=>i.hall===h.id).map(i=>i.station));
-      html+=`<div class="hall" id="salon-${h.id}"><div class="hall-head"><div class="hall-no">${h.id==="0"?"۰":h.id==="b"?"ب":fa(h.id)}</div><div class="titles"><div class="meta">${hallLabel(h)}${h.stations.length?" · "+fa(h.stations.length)+" ایستگاه":""}${total[h.id]?" · "+fa(total[h.id])+" محتوا":""}</div><h3>${esc(h.name)}</h3></div></div><div class="hall-body">`;
+      html+=`<div class="hall" id="salon-${h.id}"><div class="hall-head"><div class="hall-no">${h.id==="0"?"۰":h.id==="b"?"ب":fa(h.id)}</div><div class="titles"><div class="meta">${hallLabel(h)}${h.stations.length?"، "+fa(h.stations.length)+" ایستگاه":""}${total[h.id]?"، "+fa(total[h.id])+" محتوا":""}</div><h3>${esc(h.name)}</h3></div></div><div class="hall-body">`;
       if(h.stations.length&&!terms.length)html+=`<div class="stations">${h.stations.map((s,i)=>`<span class="st ${has.has(i+1)?"has":""}" ${has.has(i+1)?`data-jump="${h.id}-${i+1}" role="button" tabindex="0"`:""}>${fa(i+1)}. ${esc(s)}</span>`).join("")}</div>`;
       if(!list.length){html+=`<p class="empty-note">هنوز محتوایی برای این سالن بارگذاری نشده.</p></div></div>`;return}
       const groups=new Map();
@@ -477,7 +493,7 @@ function render(){
           texts.forEach(it=>{
             const heads=it.toc.filter(t=>t.level<=3).length;
             const sn=terms.length&&!terms.every(t=>it._head.includes(t))?snippet(it,terms.filter(t=>!it._head.includes(t))):"";
-            html+=`<button class="text-row" type="button" data-open="${esc(it.file)}"><span class="tico">${ICO_TEXT}</span><span class="title">${highlight(it.title,terms)}</span><span class="read">خواندن ${ICO_GO}</span><span class="sub">${esc(it.type)}${heads?" · "+fa(heads)+" بخش":""}${it.summary?" · "+highlight(it.summary,terms):""}</span>${sn?`<span class="snip">${sn}</span>`:""}</button>`;
+            html+=`<button class="text-row" type="button" data-open="${esc(it.file)}"><span class="tico">${ICO_TEXT}</span><span class="title">${highlight(it.title,terms)}</span><span class="read">خواندن ${ICO_GO}</span><span class="sub">${esc(it.type)}${heads?"، "+fa(heads)+" بخش":""}${it.summary?"، "+highlight(it.summary,terms):""}</span>${sn?`<span class="snip">${sn}</span>`:""}</button>`;
           });
           html+=`</div>`;
         }
@@ -504,6 +520,14 @@ $("#clear").addEventListener("click",()=>{$("#q").value="";state.q="";$("#clear"
 document.addEventListener("keydown",e=>{
   if(e.key==="/"&&document.activeElement!==$("#q")&&$("#reader").hidden&&$("#lb").hidden){e.preventDefault();$("#q").focus()}
   if(e.key==="Escape"){if(!$("#lb").hidden)closeLb();else if(!$("#reader").hidden)closeReader()}
+  if(e.key==="Tab"){
+    const box=!$("#lb").hidden?$("#lb"):!$("#reader").hidden?$("#reader"):null;if(!box)return;
+    const f=[...box.querySelectorAll('a[href],button,summary,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.hidden&&x.offsetParent!==null);
+    if(!f.length)return;const a=f[0],z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+    else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+    else if(!box.contains(document.activeElement)){e.preventDefault();a.focus()}
+  }
   if(!$("#lb").hidden){if(e.key==="ArrowLeft")stepLb(1);if(e.key==="ArrowRight")stepLb(-1)}
 });
 $("#list").addEventListener("click",e=>{
@@ -519,10 +543,10 @@ function openReader(file){
   const it=DATA.items.find(i=>i.file===file);if(!it)return;
   current=it;lastFocus=document.activeElement;
   const h=HALL[it.hall];
-  $("#rCrumb").textContent=hallLabel(h)+" · "+h.name+(it.station?" · ایستگاه "+fa(it.station):"");
+  $("#rCrumb").textContent=hallLabel(h)+"، "+h.name+(it.station?"، ایستگاه "+fa(it.station):"");
   $("#rTitle").textContent=it.title;
   const words=(it.text.match(/\S+/g)||[]).length;
-  $("#rMeta").textContent=it.type+" · حدود "+fa(Math.max(1,Math.round(words/200)))+" دقیقه خواندن";
+  $("#rMeta").textContent=it.type+"، حدود "+fa(Math.max(1,Math.round(words/200)))+" دقیقه خواندن";
   const w=$("#rWord");
   if(it.docx){w.hidden=false;w.href=url(it.docx);w.setAttribute("download",it.title+".docx")}else w.hidden=true;
   let raw;try{raw=marked.parse(it.text.replace(/★/g,""),{gfm:true,breaks:true})}catch(e){raw=it.text.split(/\n{2,}/).map(b=>{const m=b.match(/^(#{2,4})\s+(.+)/);return m?`<h${m[1].length}>${esc(m[2])}</h${m[1].length}>`:`<p>${esc(b).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>")}</p>`}).join("")}
@@ -542,6 +566,7 @@ function openReader(file){
   requestAnimationFrame(()=>{$("#scrim").classList.add("on");$("#reader").classList.add("on")});
   $("#rBody").scrollTop=0;onScroll();document.body.style.overflow="hidden";
   $("#rClose").focus();
+  try{history.pushState({hn:"reader"},"")}catch(e){}
   const first=$("#rDoc mark");if(first)setTimeout(()=>first.scrollIntoView({block:"center"}),80);
 }
 function goHead(e){
@@ -562,13 +587,15 @@ function markIn(root,terms){
   while(w.nextNode())ns.push(w.currentNode);
   ns.forEach(n=>{if(!terms.some(t=>norm(n.nodeValue).includes(t)))return;const s=document.createElement("span");s.innerHTML=highlight(n.nodeValue,terms);n.replaceWith(...s.childNodes)});
 }
-function closeReader(){
+function closeReader(fromPop){
+  if(fromPop!==true&&history.state&&history.state.hn==="reader"){history.back();return}
   $("#scrim").classList.remove("on");$("#reader").classList.remove("on");document.body.style.overflow="";
   setTimeout(()=>{$("#scrim").hidden=true;$("#reader").hidden=true},220);
   if(lastFocus)lastFocus.focus();
 }
-$("#rClose").addEventListener("click",closeReader);
-$("#scrim").addEventListener("click",closeReader);
+$("#rClose").addEventListener("click",()=>closeReader());
+$("#scrim").addEventListener("click",()=>closeReader());
+window.addEventListener("popstate",()=>{if(!$("#lb").hidden)closeLb(true);else if(!$("#reader").hidden)closeReader(true)});
 $("#rPrint").addEventListener("click",()=>{try{window.print()}catch(e){}});
 $("#rCopy").addEventListener("click",()=>{
   if(!current)return;
@@ -586,10 +613,11 @@ function openLb(file){
   showLb();
   $("#lb").hidden=false;requestAnimationFrame(()=>$("#lb").classList.add("on"));
   document.body.style.overflow="hidden";$("#lbClose").focus();
+  try{history.pushState({hn:"lb"},"")}catch(e){}
 }
 function showLb(){
   const it=lbList[lbIdx],h=HALL[it.hall];
-  $("#lbTitle").textContent=it.title+" · "+(it.station?stName(h,it.station):h.name);
+  $("#lbTitle").textContent=it.title+"، "+(it.station?stName(h,it.station):h.name);
   $("#lbMeta").textContent=designMeta(it);
   $("#lbImg").src=it.preview?url(it.preview):"";$("#lbImg").alt=it.title;
   $("#lbDl").href=url(it.file);$("#lbDl").setAttribute("download",it.name);
@@ -598,12 +626,16 @@ function showLb(){
   $("#lbHint").hidden=!it.preview;
 }
 function stepLb(d){if(lbList.length<2)return;lbIdx=(lbIdx+d+lbList.length)%lbList.length;showLb()}
-function closeLb(){$("#lb").classList.remove("on");setTimeout(()=>{$("#lb").hidden=true;$("#lbImg").src=""},220);document.body.style.overflow="";if(lbFocus)lbFocus.focus()}
-$("#lbClose").addEventListener("click",closeLb);
+function closeLb(fromPop){if(fromPop!==true&&history.state&&history.state.hn==="lb"){history.back();return}$("#lb").classList.remove("on");setTimeout(()=>{$("#lb").hidden=true;$("#lbImg").src=""},220);if($("#reader").hidden)document.body.style.overflow="";if(lbFocus)lbFocus.focus()}
+$("#lbClose").addEventListener("click",()=>closeLb());
+let tx=null,ty=0,swiped=false;
+$("#lbStage").addEventListener("touchstart",e=>{if($("#lbStage").classList.contains("zoom")||e.touches.length>1){tx=null;return}tx=e.touches[0].clientX;ty=e.touches[0].clientY;swiped=false},{passive:true});
+$("#lbStage").addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){swiped=true;stepLb(dx>0?1:-1)}},{passive:true});
 $("#lbPrev").addEventListener("click",e=>{e.stopPropagation();stepLb(-1)});
 $("#lbNext").addEventListener("click",e=>{e.stopPropagation();stepLb(1)});
 $("#lbStage").addEventListener("click",e=>{
   if(e.target.closest(".lb-nav"))return;
+  if(swiped){swiped=false;return}
   const st=$("#lbStage"),img=$("#lbImg");
   if(e.target!==img&&!st.classList.contains("zoom")){closeLb();return}
   const r=img.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width,fy=(e.clientY-r.top)/r.height;
