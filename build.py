@@ -25,6 +25,7 @@ GEN = os.path.join(ROOT, "generated")
 TEXT_EXT = {".md", ".docx"}
 IMG_EXT = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".webp"}
 DESIGN_EXT = IMG_EXT | {".pdf"}
+VIDEO_EXT = {".mp4", ".m4v", ".webm", ".mov"}
 FA = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 
 try:
@@ -222,7 +223,12 @@ def design_item(path, halls):
     stem = os.path.splitext(os.path.basename(path))[0]
     ext = os.path.splitext(path)[1].lower()
     tail = stem.split(" - ")[-1].strip() if " - " in stem else stem
-    label = tail if tail.startswith("طرح") else "طرح " + tail
+    tail = re.sub(r"^\d+\s*[-_.]\s*", "", tail)
+    side = next((w for w in ("راست", "وسط", "چپ") if re.search(r"(^|\s)" + w + r"$", tail)), None)
+    if side:
+        label = "قطعهٔ " + side
+    else:
+        label = tail if tail.startswith("طرح") else "طرح " + tail
     orient = None
     if "عمودی" in stem or "amudi" in stem.lower():
         orient = "portrait"
@@ -268,6 +274,56 @@ def design_item(path, halls):
     return item
 
 
+def video_title(stem):
+    if "-" in stem and " " not in stem:
+        stem = stem.replace("_", "\u200c").replace("-", " ")
+    else:
+        stem = stem.replace("_", "\u200c")
+    stem = re.sub(r"\s+", " ", stem).strip(" \u200c")
+    stem = re.sub(r"(\S) (ها|های|هایی|تر|ترین)(?=\s|$)", "\\1\u200c\\2", stem)
+    stem = re.sub(r"(^|\s)(ن?می) (?=\S)", "\\1\\2\u200c", stem)
+    return stem
+
+
+def video_item(path, halls):
+    hall, st = location(path)
+    stem = os.path.splitext(os.path.basename(path))[0]
+    item = {
+        "kind": "video", "file": rel(path), "title": video_title(stem), "name": os.path.basename(path),
+        "hall": hall, "station": st, "type": "ریلز", "format": os.path.splitext(path)[1][1:].upper(),
+        "bytes": os.path.getsize(path),
+    }
+    if shutil.which("ffprobe"):
+        try:
+            out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                                  "stream=width,height:format=duration", "-of", "json", path],
+                                 capture_output=True, text=True, timeout=60).stdout
+            info = json.loads(out)
+            v = (info.get("streams") or [{}])[0]
+            item["w"], item["h"] = v.get("width"), v.get("height")
+            item["dur"] = round(float(info.get("format", {}).get("duration", 0)))
+        except Exception:
+            pass
+    if shutil.which("ffmpeg"):
+        k = key(path)
+        poster = os.path.join(GEN, "poster", k + ".webp")
+        with open(path, "rb") as fh:
+            stamp = hashlib.sha1(fh.read()).hexdigest()
+        sfile = poster + ".sha"
+        if not (os.path.exists(poster) and os.path.exists(sfile) and open(sfile).read() == stamp):
+            os.makedirs(os.path.dirname(poster), exist_ok=True)
+            at = "1" if item.get("dur", 2) > 2 else "0"
+            try:
+                subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", at, "-i", path, "-frames:v", "1",
+                                "-vf", "scale='min(540,iw)':-2", "-q:v", "70", poster], check=True, timeout=120)
+                open(sfile, "w").write(stamp)
+            except Exception:
+                pass
+        if os.path.exists(poster):
+            item["poster"] = rel(poster)
+    return item
+
+
 def main():
     data = json.load(open(os.path.join(ROOT, "halls.json"), encoding="utf-8"))
     halls = {h["id"]: h for h in data["halls"]}
@@ -278,6 +334,8 @@ def main():
         ext = os.path.splitext(p)[1].lower()
         if ext in TEXT_EXT:
             it = text_item(p, halls)
+        elif ext in VIDEO_EXT:
+            it = video_item(p, halls)
         elif ext in DESIGN_EXT:
             it = design_item(p, halls)
         else:
@@ -288,7 +346,8 @@ def main():
     with open(os.path.join(ROOT, "content.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     t = sum(1 for i in items if i["kind"] == "text")
-    print(f"content.json: {t} متن، {len(items) - t} طرح")
+    v = sum(1 for i in items if i["kind"] == "video")
+    print(f"content.json: {t} متن، {len(items) - t - v} طرح، {v} ویدیو")
 
 
 if __name__ == "__main__":

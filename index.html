@@ -99,7 +99,7 @@ a{color:inherit}
 .chip{border:1px solid var(--hair);background:var(--card);color:var(--body);border-radius:999px;height:34px;padding:0 14px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .14s var(--ease),border-color .14s var(--ease),color .14s var(--ease)}
 .chip:hover{background:var(--sunken)}
 .chip[aria-pressed="true"]{background:var(--strong);color:var(--page);border-color:var(--strong)}
-.chip .n{font-weight:400;opacity:.7;font-size:13px}
+.chip .n{font-weight:400;font-size:13px}
 .toggle{margin-inline-start:auto;display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none}
 .toggle input{accent-color:var(--brand);width:16px;height:16px}
 .status{font-size:14px;color:var(--muted);padding-block:6px 0;min-height:30px}
@@ -157,6 +157,27 @@ a{color:inherit}
 
 .designs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;align-items:end}
 .design{display:grid;gap:10px;min-width:0}
+.wall{display:flex;gap:3px;border-radius:12px;overflow:hidden;background:var(--sunken)}
+.wall button{border:0;padding:0;margin:0;background:none;cursor:zoom-in;display:block;min-width:0}
+.wall img{display:block;width:100%;height:auto}
+.panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.panel{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--sunken);border-radius:12px;padding:8px 10px 8px 8px}
+.panel b{display:block;color:var(--strong);font-size:14px;line-height:1.5}
+.panel small{display:block;color:var(--muted);font-size:12px;line-height:1.6;font-variant-numeric:tabular-nums}
+.vids-label{font-size:13px;font-weight:700;color:var(--muted)}
+.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px}
+.vid{display:grid;gap:6px;min-width:0}
+.vid .vt{position:relative;aspect-ratio:9/16;max-width:100%;width:100%;border-radius:12px;overflow:hidden;background:var(--stage);border:0;padding:0;cursor:pointer;display:block}
+.vid .vt img{width:100%;height:100%;object-fit:cover;display:block}
+.vid .vt .pl{position:absolute;left:8px;bottom:8px;width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.92);color:#1B1D33;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.vid .vt .pl svg{width:16px;height:16px;margin-left:-2px}
+.vid .vt .du{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;background:rgba(27,29,51,.75);color:#fff;border-radius:999px;padding:1px 8px;line-height:1.7;font-variant-numeric:tabular-nums}
+.vid .vt:hover .pl{transform:scale(1.06)}
+.vid .vc{display:flex;gap:4px;align-items:flex-start;justify-content:space-between}
+.vid .vc b{font-size:13px;line-height:1.6;color:var(--strong);font-weight:600;min-width:0}
+.vid .vc a{flex:none}
+.lb-stage video{max-width:100%;max-height:100%;border-radius:8px;background:#000;display:block}
+@media (max-width:640px){.panels{grid-template-columns:minmax(0,1fr)}.vids{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .design.wide{grid-column:1/-1}
 .design.wide .thumb{height:auto;min-height:120px}
 .design .thumb{display:flex;align-items:center;justify-content:center;background:var(--sunken);border-radius:14px;padding:12px;cursor:zoom-in;border:1px solid transparent;transition:border-color .14s var(--ease),transform .14s var(--ease);height:260px;width:100%}
@@ -352,7 +373,7 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
   </div>
   <div class="lb-stage" id="lbStage">
     <button class="lb-nav prev" id="lbPrev" type="button" aria-label="طرح قبلی"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
-    <img id="lbImg" alt="">
+    <img id="lbImg" alt=""><video id="lbVid" controls playsinline preload="metadata" hidden></video>
     <button class="lb-nav next" id="lbNext" type="button" aria-label="طرح بعدی"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
     <div class="lb-hint" id="lbHint">برای بزرگ‌نمایی روی طرح بزنید</div>
   </div>
@@ -417,13 +438,13 @@ load().then(d=>{
 });
 
 function buildFilters(){
-  const pc={},kc={text:0,design:0};
+  const pc={},kc={text:0,design:0,video:0};
   DATA.items.forEach(it=>{const p=(HALL[it.hall]||{}).part;pc[p]=(pc[p]||0)+1;kc[it.kind]++});
   let h=`<button class="chip" data-part="all" aria-pressed="true">همهٔ بخش‌ها</button>`;
   DATA.parts.forEach(p=>{h+=`<button class="chip" data-part="${p.id}" aria-pressed="false">${esc(p.name)}${pc[p.id]?` <span class="n">${fa(pc[p.id])}</span>`:""}</button>`});
   h+=`<label class="toggle"><input type="checkbox" id="showEmpty" ${state.showEmpty?"checked":""}> نمایش سالن‌های بی‌محتوا</label>`;
   $("#parts").innerHTML=h;
-  $("#kinds").innerHTML=`<button class="chip" data-kind="all" aria-pressed="true">همه</button><button class="chip" data-kind="text" aria-pressed="false">متن‌ها <span class="n">${fa(kc.text)}</span></button><button class="chip" data-kind="design" aria-pressed="false">طرح‌ها <span class="n">${fa(kc.design)}</span></button>`;
+  $("#kinds").innerHTML=`<button class="chip" data-kind="all" aria-pressed="true">همه</button><button class="chip" data-kind="text" aria-pressed="false">متن‌ها <span class="n">${fa(kc.text)}</span></button><button class="chip" data-kind="design" aria-pressed="false">طرح‌ها <span class="n">${fa(kc.design)}</span></button>${kc.video?`<button class="chip" data-kind="video" aria-pressed="false">ریلزها <span class="n">${fa(kc.video)}</span></button>`:""}`;
   $("#kinds").hidden=!DATA.items.length;
   $("#parts").addEventListener("click",e=>{const b=e.target.closest("[data-part]");if(!b)return;state.part=b.dataset.part;press("#parts","part",state.part);render()});
   $("#kinds").addEventListener("click",e=>{const b=e.target.closest("[data-kind]");if(!b)return;state.kind=b.dataset.kind;press("#kinds","kind",state.kind);render()});
@@ -437,6 +458,7 @@ function snippet(it,terms){
   const a=Math.max(0,i-60),b=Math.min(t.length,i+terms[0].length+100);
   return (a>0?"… ":"")+highlight(t.slice(a,b),terms)+(b<t.length?" …":"");
 }
+const dur=s=>fa(Math.floor(s/60)+":"+String(s%60).padStart(2,"0"));
 function designMeta(it){
   const p=[it.format,mb(it.bytes)];
   if(it.cm)p.push(fa(it.cm[0])+"×"+fa(it.cm[1])+" سانتی‌متر");
@@ -456,11 +478,11 @@ function render(){
   });
   const by={};hits.forEach(it=>(by[it.hall]=by[it.hall]||[]).push(it));
   const total={};DATA.items.forEach(it=>total[it.hall]=(total[it.hall]||0)+1);
-  const nT=hits.filter(i=>i.kind==="text").length,nD=hits.length-nT;
+  const nT=hits.filter(i=>i.kind==="text").length,nV=hits.filter(i=>i.kind==="video").length,nD=hits.length-nT-nV;
 
   const st=$("#status");
   if(!DATA.items.length)st.innerHTML=`هنوز محتوایی بارگذاری نشده، <b>${fa(DATA.halls.filter(h=>h.id!=="0"&&h.id!=="b").length)}</b> سالن آمادهٔ محتوا`;
-  else st.innerHTML=(terms.length?`نتیجهٔ «${esc(state.q.trim())}»: `:"")+`<b>${fa(nT)}</b> متن و <b>${fa(nD)}</b> طرح در <b>${fa(Object.keys(by).length)}</b> سالن`;
+  else st.innerHTML=(terms.length?`نتیجهٔ «${esc(state.q.trim())}»: `:"")+[[nT,"متن"],[nD,"طرح"],[nV,"ریلز"]].filter(x=>x[0]).map(x=>`<b>${fa(x[0])}</b> ${x[1]}`).join("، ").replace(/، ([^،]*)$/," و $1")+` در <b>${fa(Object.keys(by).length)}</b> سالن`;
 
   let rail="";
   DATA.parts.forEach(p=>{
@@ -497,12 +519,21 @@ function render(){
           });
           html+=`</div>`;
         }
-        if(designs.length){
+        const panels=designs.filter(d=>d.title.startsWith("قطعهٔ")).sort((a,b)=>a.file.localeCompare(b.file));
+        const others=designs.filter(d=>!panels.includes(d));
+        if(panels.length){
+          html+=`<div><div class="wall">${panels.map(it=>`<button type="button" data-view="${esc(it.file)}" style="flex:${it.w||1} 1 0" aria-label="بزرگ‌نمایی ${esc(it.title)}"><img src="${url(it.preview||it.thumb)}" width="${it.w||""}" height="${it.h||""}" alt="${esc(it.title)}" loading="lazy"></button>`).join("")}</div><div class="panels">${panels.map(it=>`<div class="panel"><div><b>${highlight(it.title,terms)}</b><small>${designMeta(it)}</small></div><a class="btn sm icon" href="${url(it.file)}" download="${esc(it.name)}" title="دانلود فایل چاپی" aria-label="دانلود ${esc(it.title)}">${ICO_DL}</a></div>`).join("")}</div></div>`;
+        }
+        if(others.length){
           html+=`<div class="designs">`;
-          designs.forEach(it=>{
+          others.forEach(it=>{
             html+=`<div class="design${it.wide?" wide":""}"><button class="thumb" type="button" data-view="${esc(it.file)}" aria-label="پیش‌نمایش ${esc(it.title)}">${it.thumb?`<img src="${url(it.thumb)}" alt="${esc(it.title)}" loading="lazy">`:`<span>${esc(it.format)}</span>`}</button><div class="info"><div><b>${highlight(it.title,terms)}</b><small>${designMeta(it)}</small></div><a class="btn sm icon" href="${url(it.file)}" download="${esc(it.name)}" title="دانلود فایل چاپی" aria-label="دانلود ${esc(it.title)}">${ICO_DL}</a></div></div>`;
           });
           html+=`</div>`;
+        }
+        const vids=items.filter(i=>i.kind==="video").sort((a,b)=>a.title.localeCompare(b.title,"fa"));
+        if(vids.length){
+          html+=`<div class="vids-label">ریلزها، ${fa(vids.length)} ویدیو</div><div class="vids">${vids.map(it=>`<div class="vid"><button class="vt" type="button" data-view="${esc(it.file)}" aria-label="پخش ریلز: ${esc(it.title)}">${it.poster?`<img src="${url(it.poster)}" alt="" loading="lazy">`:""}${it.dur?`<span class="du">${dur(it.dur)}</span>`:""}<span class="pl"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></button><div class="vc"><b>${highlight(it.title,terms)}</b><a class="btn sm icon" href="${url(it.file)}" download="${esc(it.name)}" title="دانلود ویدیو" aria-label="دانلود ${esc(it.title)}">${ICO_DL}</a></div></div>`).join("")}</div>`;
         }
         html+=`</div></div>`;
       });
@@ -608,7 +639,10 @@ function selectDoc(){const r=document.createRange();r.selectNodeContents($("#rDo
 let lbList=[],lbIdx=0,lbFocus=null;
 function openLb(file){
   const it=DATA.items.find(i=>i.file===file);if(!it)return;
-  lbList=DATA.items.filter(i=>i.kind==="design"&&i.hall===it.hall&&i.station===it.station).sort((a,b)=>a.orient===b.orient?a.title.localeCompare(b.title,"fa"):a.orient==="portrait"?-1:1);
+  const same=i=>i.kind===it.kind&&i.hall===it.hall&&i.station===it.station;
+  lbList=DATA.items.filter(same);
+  if(it.kind==="video")lbList.sort((a,b)=>a.title.localeCompare(b.title,"fa"));
+  else{const pn=lbList.filter(d=>d.title.startsWith("قطعهٔ")).sort((a,b)=>a.file.localeCompare(b.file));const ot=lbList.filter(d=>!pn.includes(d)).sort((a,b)=>a.orient===b.orient?a.title.localeCompare(b.title,"fa"):a.orient==="portrait"?-1:1);lbList=it.title.startsWith("قطعهٔ")?pn:ot}
   lbIdx=lbList.indexOf(it);lbFocus=document.activeElement;
   showLb();
   $("#lb").hidden=false;requestAnimationFrame(()=>$("#lb").classList.add("on"));
@@ -618,15 +652,19 @@ function openLb(file){
 function showLb(){
   const it=lbList[lbIdx],h=HALL[it.hall];
   $("#lbTitle").textContent=it.title+"، "+(it.station?stName(h,it.station):h.name);
-  $("#lbMeta").textContent=designMeta(it);
-  $("#lbImg").src=it.preview?url(it.preview):"";$("#lbImg").alt=it.title;
+  const isV=it.kind==="video",v=$("#lbVid");
+  $("#lbMeta").textContent=isV?[it.format,mb(it.bytes),it.dur?dur(it.dur):""].filter(Boolean).join("، "):designMeta(it);
+  $("#lbImg").hidden=isV;v.hidden=!isV;
+  if(isV){$("#lbImg").removeAttribute("src");v.poster=it.poster?url(it.poster):"";v.src=url(it.file);v.play().catch(()=>{})}
+  else{v.pause();v.removeAttribute("src");v.load();$("#lbImg").src=it.preview?url(it.preview):"";$("#lbImg").alt=it.title}
+  $("#lbDl").lastChild.textContent=isV?"دانلود ویدیو":"دانلود چاپی";
   $("#lbDl").href=url(it.file);$("#lbDl").setAttribute("download",it.name);
   $("#lbStage").classList.remove("zoom");
   $("#lbPrev").hidden=$("#lbNext").hidden=lbList.length<2;
-  $("#lbHint").hidden=!it.preview;
+  $("#lbHint").hidden=isV||!it.preview;
 }
 function stepLb(d){if(lbList.length<2)return;lbIdx=(lbIdx+d+lbList.length)%lbList.length;showLb()}
-function closeLb(fromPop){if(fromPop!==true&&history.state&&history.state.hn==="lb"){history.back();return}$("#lb").classList.remove("on");setTimeout(()=>{$("#lb").hidden=true;$("#lbImg").src=""},220);if($("#reader").hidden)document.body.style.overflow="";if(lbFocus)lbFocus.focus()}
+function closeLb(fromPop){if(fromPop!==true&&history.state&&history.state.hn==="lb"){history.back();return}$("#lb").classList.remove("on");const v=$("#lbVid");v.pause();v.removeAttribute("src");v.load();setTimeout(()=>{$("#lb").hidden=true;$("#lbImg").removeAttribute("src")},220);if($("#reader").hidden)document.body.style.overflow="";if(lbFocus)lbFocus.focus()}
 $("#lbClose").addEventListener("click",()=>closeLb());
 let tx=null,ty=0,swiped=false;
 $("#lbStage").addEventListener("touchstart",e=>{if($("#lbStage").classList.contains("zoom")||e.touches.length>1){tx=null;return}tx=e.touches[0].clientX;ty=e.touches[0].clientY;swiped=false},{passive:true});
@@ -636,6 +674,7 @@ $("#lbNext").addEventListener("click",e=>{e.stopPropagation();stepLb(1)});
 $("#lbStage").addEventListener("click",e=>{
   if(e.target.closest(".lb-nav"))return;
   if(swiped){swiped=false;return}
+  if(!$("#lbVid").hidden){if(e.target.id==="lbStage")closeLb();return}
   const st=$("#lbStage"),img=$("#lbImg");
   if(e.target!==img&&!st.classList.contains("zoom")){closeLb();return}
   const r=img.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width,fy=(e.clientY-r.top)/r.height;
